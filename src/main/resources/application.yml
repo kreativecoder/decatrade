@@ -1,0 +1,25 @@
+server:
+  port: 5000
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/decatrade
+    username: abiolaadebanjo
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: none
+  thymeleaf:
+    cache: false
+
+  flyway:
+    enabled: true
+    url: ${spring.datasource.url}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    baseline-on-migrate: true
+
+management:
+  endpoint:
+    health:
+      show-details: always
