@@ -1,6 +1,7 @@
 package com.decagon.decatrade.service;
 
 import com.decagon.decatrade.dto.UserDto;
+import com.decagon.decatrade.exception.BadRequestException;
 import com.decagon.decatrade.model.User;
 import com.decagon.decatrade.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,16 +27,11 @@ public class UserServiceImpl implements UserService {
     public UserDto save(UserDto userDto) {
         Optional<User> optionalUser = findByUsername(userDto.getUsername());
         if (!optionalUser.isPresent()) {
-            User user = new User();
-            user.setUsername(userDto.getUsername());
-            user.setFirstName(userDto.getFirstName());
-            user.setLastName(userDto.getLastName());
-            user.setPassword(userDto.getPassword());
-
-            user = userRepository.save(user);
+            User user = new User(userDto.getUsername(), userDto.getFirstName(), userDto.getLastName(), userDto.getPassword());
+            userRepository.save(user);
             return userDto;
         } else {
-            throw new RuntimeException("Username exists.");
+            throw new BadRequestException("Username exists.");
         }
     }
 

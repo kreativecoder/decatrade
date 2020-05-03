@@ -1,13 +1,21 @@
 package com.decagon.decatrade.controller;
 
 import com.decagon.decatrade.dto.Response;
+import com.decagon.decatrade.dto.UserDto;
+import com.decagon.decatrade.exception.BadRequestException;
 import com.decagon.decatrade.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -17,14 +25,17 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("check")
-    public Response checkUserName(@RequestParam(value = "username") String username) {
-        Response response;
+    public ResponseEntity<Response> checkUserName(@RequestParam(value = "username") String username) {
         if (userService.isUsernameAvailable(username)) {
-            response = new Response("00", "Success");
+            return ResponseEntity.ok(new Response("00", "Success"));
         } else {
-            response = new Response("04", "Username exists.");
+            throw new BadRequestException("Username exists.");
         }
+    }
 
-        return response;
+    @PostMapping
+    public ResponseEntity<Response> registerUser(@Valid @RequestBody UserDto userDto) {
+        userService.save(userDto);
+        return new ResponseEntity<>(new Response("00", "User Created."), HttpStatus.CREATED);
     }
 }

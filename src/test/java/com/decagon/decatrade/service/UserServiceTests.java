@@ -1,6 +1,7 @@
 package com.decagon.decatrade.service;
 
 import com.decagon.decatrade.dto.UserDto;
+import com.decagon.decatrade.exception.BadRequestException;
 import com.decagon.decatrade.model.User;
 import com.decagon.decatrade.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ public class UserServiceTests {
 
         //username already exists
         when(userRepository.findByUsername(userDto.getUsername())).thenReturn(Optional.of(new User()));
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> userService.save(userDto));
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> userService.save(userDto));
         assertEquals(exception.getMessage(), "Username exists.");
 
 
