@@ -3,7 +3,6 @@ package com.decagon.decatrade.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -18,7 +17,7 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
 
-        User user = (User) authentication.getPrincipal();
+        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
 
         return JWT.create()
             .withSubject(user.getUsername())

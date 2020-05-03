@@ -22,13 +22,19 @@ public class AbstractExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Response> constraintViolation(BadRequestException ex) {
-        log.error("BadRequestException Exception >>> " + ex);
+        log.error("BadRequestException >>> " + ex);
         return new ResponseEntity<>(ex.getResponse(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Response> constraintViolation(BadCredentialsException ex) {
-        log.error("BadCredentialsException Exception >>> " + ex);
+        log.error("BadCredentialsException >>> " + ex);
         return new ResponseEntity<>(new Response(Constants.FORMAT_ERROR_CODE, ex.getMessage()), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Response> constraintViolation(NotFoundException ex) {
+        log.error("NotFoundException >>> " + ex);
+        return new ResponseEntity<>(ex.getResponse(), HttpStatus.NOT_FOUND);
     }
 }

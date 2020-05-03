@@ -3,6 +3,7 @@ package com.decagon.decatrade.security;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -18,10 +19,12 @@ import static com.decagon.decatrade.utils.Constants.TOKEN_PREFIX;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     JwtTokenProvider jwtTokenProvider;
+    UserDetailsServiceImpl userDetailsService;
 
-    public JWTAuthorizationFilter(AuthenticationManager authManager, JwtTokenProvider jwtTokenProvider) {
+    public JWTAuthorizationFilter(AuthenticationManager authManager, JwtTokenProvider jwtTokenProvider, UserDetailsServiceImpl userDetailsService) {
         super(authManager);
         this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -45,7 +48,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         //token is either empty or invalid
         if (username != null) {
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, new ArrayList<>());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             return authentication;
         }
