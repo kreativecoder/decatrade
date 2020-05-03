@@ -5,6 +5,7 @@ import com.decagon.decatrade.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -23,5 +24,11 @@ public class AbstractExceptionHandler {
     public ResponseEntity<Response> constraintViolation(BadRequestException ex) {
         log.error("BadRequestException Exception >>> " + ex);
         return new ResponseEntity<>(ex.getResponse(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Response> constraintViolation(BadCredentialsException ex) {
+        log.error("BadCredentialsException Exception >>> " + ex);
+        return new ResponseEntity<>(new Response(Constants.FORMAT_ERROR_CODE, ex.getMessage()), HttpStatus.FORBIDDEN);
     }
 }

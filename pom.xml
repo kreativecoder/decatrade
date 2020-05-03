@@ -20,6 +20,7 @@
         <java.version>1.8</java.version>
         <rest-assured.version>4.2.0</rest-assured.version>
         <auth0.jwt.version>3.4.0</auth0.jwt.version>
+        <retrofit.version>2.8.1</retrofit.version>
     </properties>
 
     <dependencies>
@@ -99,6 +100,16 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>retrofit</artifactId>
+            <version>${retrofit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-gson</artifactId>
+            <version>${retrofit.version}</version>
         </dependency>
     </dependencies>
 
