@@ -1,5 +1,6 @@
 package com.decagon.decatrade.integration;
 
+import com.decagon.decatrade.dto.LoginRequest;
 import com.decagon.decatrade.dto.UserDto;
 import com.decagon.decatrade.service.UserService;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,8 @@ import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.emptyString;
 
 
 public class UserIT extends BaseIT {
@@ -26,7 +29,7 @@ public class UserIT extends BaseIT {
     public void testCheckUsername() {
         String username = randomUsername();
         //clean state, username available for use
-        get("/api/v1/users/check?username=" + username)
+        get("users/check?username=" + username)
             .then()
             .assertThat()
             .statusCode(SC_OK)
@@ -37,7 +40,7 @@ public class UserIT extends BaseIT {
         createUser(username);
 
         //username no longer available
-        get("/api/v1/users/check?username=" + username)
+        get("users/check?username=" + username)
             .then()
             .assertThat()
             .statusCode(SC_BAD_REQUEST)
@@ -55,12 +58,31 @@ public class UserIT extends BaseIT {
         given()
             .contentType(JSON)
             .body(userDto)
-            .post("/api/v1/users")
+            .post("users")
             .then()
             .assertThat()
             .statusCode(SC_CREATED)
             .body("code", is("00"),
                 "message", is("User Created."));
+
+        //delete user
+        userService.deleteUser(userDto.getUsername());
+    }
+
+    @Test
+    public void testUserLogin() {
+        //insert test user in database
+        UserDto userDto = createUser(randomUsername());
+
+        //assert successful and token comes back
+        given()
+            .contentType(JSON)
+            .body(new LoginRequest(userDto.getUsername(), userDto.getPassword()))
+            .post("users/login")
+            .then()
+            .assertThat()
+            .statusCode(SC_OK)
+            .body("token", is(not(emptyString())));
 
         //delete user
         userService.deleteUser(userDto.getUsername());

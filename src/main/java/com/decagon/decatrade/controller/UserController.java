@@ -1,5 +1,6 @@
 package com.decagon.decatrade.controller;
 
+import com.decagon.decatrade.dto.LoginRequest;
 import com.decagon.decatrade.dto.Response;
 import com.decagon.decatrade.dto.UserDto;
 import com.decagon.decatrade.exception.BadRequestException;
@@ -16,6 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -27,7 +32,7 @@ public class UserController {
     @GetMapping("check")
     public ResponseEntity<Response> checkUserName(@RequestParam(value = "username") String username) {
         if (userService.isUsernameAvailable(username)) {
-            return ResponseEntity.ok(new Response("00", "Success"));
+            return ok(new Response("00", "Success"));
         } else {
             throw new BadRequestException("Username exists.");
         }
@@ -37,5 +42,14 @@ public class UserController {
     public ResponseEntity<Response> registerUser(@Valid @RequestBody UserDto userDto) {
         userService.save(userDto);
         return new ResponseEntity<>(new Response("00", "User Created."), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        String token = userService.authenticateUser(loginRequest.getUsername(), loginRequest.getPassword());
+        Map<Object, Object> model = new HashMap<>();
+        model.put("token", token);
+
+        return ok(model);
     }
 }

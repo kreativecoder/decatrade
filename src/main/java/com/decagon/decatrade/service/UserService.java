@@ -12,6 +12,8 @@ public interface UserService {
 
     UserDto save(UserDto userDto);
 
+    String authenticateUser(String username, String password);
+
     List<User> getAllUsers();
 
     boolean isUsernameAvailable(String username);

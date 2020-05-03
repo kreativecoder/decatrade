@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class BaseIT {
-    private static final String BASE_URI = "http://localhost";
+    private static final String BASE_URI = "http://localhost/api/v1/";
 
     @Value("${local.server.port}")
     private int port;
@@ -18,5 +18,6 @@ public abstract class BaseIT {
     void setup() {
         RestAssured.baseURI = BASE_URI;
         RestAssured.port = port;
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
     }
 }

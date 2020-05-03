@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -17,12 +18,16 @@ import static com.decagon.decatrade.TestUtils.randomUsername;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTests {
     @Mock
     UserRepository userRepository;
+    @Mock
+    PasswordEncoder passwordEncoder;
     @InjectMocks
     UserServiceImpl userService;
 
@@ -53,6 +58,7 @@ public class UserServiceTests {
 
         //username does not exist, user can be saved.
         when(userRepository.findByUsername(userDto.getUsername())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).then(returnsFirstArg());
         UserDto saved = userService.save(userDto);
         assertEquals(saved.getUsername(), userDto.getUsername());
     }
