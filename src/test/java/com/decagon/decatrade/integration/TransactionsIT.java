@@ -2,6 +2,7 @@ package com.decagon.decatrade.integration;
 
 import com.decagon.decatrade.dto.LoginRequest;
 import com.decagon.decatrade.dto.UserDto;
+import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -10,16 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.decagon.decatrade.TestUtils.randomName;
 import static com.decagon.decatrade.TestUtils.randomUsername;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.apache.http.HttpStatus.SC_ACCEPTED;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TransactionsIT extends BaseIT {
@@ -60,47 +62,131 @@ public class TransactionsIT extends BaseIT {
     }
 
     @Test
-    public void testCreateTransaction() {
-        String reference = UUID.randomUUID().toString();
-        Map<String, String> request = new HashMap<>();
-        request.put("symbol", "AAPL");
-        request.put("quantity", "10");
-        request.put("transactionType", "BUY");
-        request.put("reference", reference);
+    public void testBuyStock() {
+        Map<String, String> request = testTransaction("AAPL", 10, "BUY");
 
-        //create transaction
-        given()
-            .contentType(JSON)
-            .header("Authorization", "Bearer " + authToken)
-            .body(request)
-            .post("transactions")
-            .then()
+        buyStock(request);
+    }
+
+    @Test
+    public void testSellStock() {
+        Map<String, String> request = testTransaction("TSLA", 10, "BUY");
+
+        //buy tesla
+        buyStock(request);
+
+        //sell xxx, doesn't exist
+        request = testTransaction("xxx", 10, "SELL");
+        createTransaction(request)
+            .assertThat()
+            .statusCode(SC_NOT_FOUND)
+            .body("code", is("25"),
+                "message", is("User does not own stock."));
+
+        //sell more tsla quantity
+        request = testTransaction("TSLA", 100, "SELL");
+        createTransaction(request)
+            .assertThat()
+            .statusCode(SC_BAD_REQUEST)
+            .body("code", is("30"),
+                "message", is("User position is less than sell quantity."));
+
+        //valid order
+        request = testTransaction("TSLA", 5, "SELL");
+        createTransaction(request)
             .assertThat()
             .statusCode(SC_ACCEPTED)
-            .body("reference", is(reference),
+            .body("reference", is(request.get("reference")),
                 "$", hasKey("totalAmount"));
 
-        //confirm transaction
-        given()
-            .contentType(JSON)
-            .header("Authorization", "Bearer " + authToken)
-            .get("transactions/confirm?reference=" + reference)
-            .then()
+        confirmTransaction(request.get("reference"))
             .assertThat()
             .statusCode(SC_CREATED)
-            .body("reference", is(reference),
+            .body("reference", is(request.get("reference")),
                 "$", hasKey("totalAmount"));
+    }
 
+    @Test
+    public void testConfirmWrongTransaction() {
         //confirm non-existent transaction
-        given()
-            .contentType(JSON)
-            .header("Authorization", "Bearer " + authToken)
-            .get("transactions/confirm?reference=" + randomName())
-            .then()
+        confirmTransaction("ref")
             .assertThat()
             .statusCode(SC_NOT_FOUND)
             .body("code", is("25"),
                 "message", is("Transaction not found."));
+    }
+
+    @Test
+    public void testGetUserStocks() {
+        //user has no stocks
+
+        getStocks()
+            .assertThat()
+            .statusCode(SC_OK)
+            .body("$", hasSize(0));
+
+        //buy stocks
+        Map<String, String> request = testTransaction("TSLA", 10, "BUY");
+        buyStock(request);
+        request = testTransaction("nflx", 5, "BUY");
+        buyStock(request);
+
+        getStocks()
+            .assertThat()
+            .statusCode(SC_OK)
+            .body("$", hasSize(2));
+    }
+
+    private ValidatableResponse getStocks() {
+        return given()
+            .contentType(JSON)
+            .header("Authorization", "Bearer " + authToken)
+            .get("stocks")
+            .then();
+    }
+
+    private void buyStock(Map<String, String> request) {
+        createTransaction(request)
+            .assertThat()
+            .statusCode(SC_ACCEPTED)
+            .body("reference", is(request.get("reference")),
+                "$", hasKey("totalAmount"));
+
+        confirmTransaction(request.get("reference"))
+            .assertThat()
+            .statusCode(SC_CREATED)
+            .body("reference", is(request.get("reference")),
+                "$", hasKey("totalAmount"));
+    }
+
+
+    private ValidatableResponse createTransaction(Map<String, String> request) {
+        //create transaction
+        return given()
+            .contentType(JSON)
+            .header("Authorization", "Bearer " + authToken)
+            .body(request)
+            .post("transactions")
+            .then();
+    }
+
+    private ValidatableResponse confirmTransaction(String reference) {
+        //confirm transaction
+        return given()
+            .contentType(JSON)
+            .header("Authorization", "Bearer " + authToken)
+            .get("transactions/confirm?reference=" + reference)
+            .then();
+    }
+
+    private Map<String, String> testTransaction(String symbol, long quantity, String type) {
+        Map<String, String> request = new HashMap<>();
+        request.put("symbol", symbol);
+        request.put("quantity", String.valueOf(quantity));
+        request.put("transactionType", type);
+        request.put("reference", UUID.randomUUID().toString());
+
+        return request;
     }
 
     @AfterAll

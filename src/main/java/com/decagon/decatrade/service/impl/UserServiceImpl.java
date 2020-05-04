@@ -1,10 +1,11 @@
-package com.decagon.decatrade.service;
+package com.decagon.decatrade.service.impl;
 
 import com.decagon.decatrade.dto.UserDto;
 import com.decagon.decatrade.exception.BadRequestException;
 import com.decagon.decatrade.model.User;
 import com.decagon.decatrade.repository.UserRepository;
 import com.decagon.decatrade.security.JwtTokenProvider;
+import com.decagon.decatrade.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

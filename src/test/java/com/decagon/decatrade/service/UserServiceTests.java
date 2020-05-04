@@ -4,6 +4,7 @@ import com.decagon.decatrade.dto.UserDto;
 import com.decagon.decatrade.exception.BadRequestException;
 import com.decagon.decatrade.model.User;
 import com.decagon.decatrade.repository.UserRepository;
+import com.decagon.decatrade.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

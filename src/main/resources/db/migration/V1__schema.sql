@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS stocks
 (
     id         SERIAL PRIMARY KEY NOT NULL,
     quantity   BIGINT             NOT NULL,
-    symbol     VARCHAR(10) UNIQUE NOT NULL,
+    symbol     VARCHAR(10)        NOT NULL,
     user_id    BIGINT             NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE,
     updated_at TIMESTAMP WITH TIME ZONE,

@@ -1,6 +1,7 @@
-package com.decagon.decatrade.service;
+package com.decagon.decatrade.service.impl;
 
 import com.decagon.decatrade.dto.QuoteResponse;
+import com.decagon.decatrade.service.IEXService;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
 import retrofit2.Retrofit;
