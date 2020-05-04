@@ -3,7 +3,7 @@ package com.decagon.decatrade.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Order(1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
@@ -27,9 +28,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
-            .antMatchers("/api/v1/users/check").permitAll()
-            .antMatchers(HttpMethod.POST, "/api/v1/users", "/api/v1/users/login").permitAll()
-            .anyRequest().authenticated()
+            .antMatchers("/api/v1/users/check", "/api/v1/users", "/api/v1/users/login").permitAll()
+            .antMatchers("/api/v1/**").authenticated()
             .and()
             .addFilter(new JWTAuthorizationFilter(authenticationManager(), jwtTokenProvider, userDetailsService))
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

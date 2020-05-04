@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:2020"
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db/decatrade
+      SPRING_DATASOURCE_USERNAME: tc
+      SPRING_DATASOURCE_PASSWORD: tc
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:6543"
+    restart: always
+    environment:
+      POSTGRES_DB: decatrade
+      POSTGRES_USER: decatrade
+      POSTGRES_PASSWORD: decatrade
