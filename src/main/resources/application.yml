@@ -23,3 +23,8 @@ management:
   endpoint:
     health:
       show-details: always
+
+iex:
+  base:
+    url: https://cloud.iexapis.com/stable/
+  token: pk_d024f60c01db434ebcc6a3aa20baeaf3

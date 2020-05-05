@@ -4,12 +4,14 @@ services:
   app:
     build: .
     ports:
-      - "5000:2020"
+      - "5000:5000"
     restart: always
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db/decatrade
-      SPRING_DATASOURCE_USERNAME: tc
-      SPRING_DATASOURCE_PASSWORD: tc
+      SPRING_DATASOURCE_USERNAME: decatrade
+      SPRING_DATASOURCE_PASSWORD: decatrade
+      IEX_BASE_URL: https://cloud.iexapis.com/stable/
+      IEX_TOKEN: pk_d024f60c01db434ebcc6a3aa20baeaf3
     depends_on:
       - db
 
