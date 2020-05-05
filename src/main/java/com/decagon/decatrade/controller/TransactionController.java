@@ -10,6 +10,7 @@ import com.decagon.decatrade.security.UserPrincipal;
 import com.decagon.decatrade.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,15 +19,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import retrofit2.http.Query;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.format.annotation.DateTimeFormat.ISO.DATE;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -61,9 +65,11 @@ public class TransactionController {
         transactionService.cancelTransaction(currentUser.getId(), reference);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<TransactionDto>> getTransactions(@CurrentUser UserPrincipal currentUser) {
-        List<TransactionDto> transactions = transactionService.getUserTransactions(currentUser.getId())
+    @GetMapping
+    public ResponseEntity<List<TransactionDto>> getTransactions(@CurrentUser UserPrincipal currentUser,
+                                                                @RequestParam(name = "from", required = false) @DateTimeFormat(iso = DATE, pattern = "dd.MM.yyyy") Date dateFrom,
+                                                                @RequestParam(name = "to", required = false) @DateTimeFormat(iso = DATE, pattern = "dd.MM.yyyy") Date dateTo) {
+        List<TransactionDto> transactions = transactionService.getUserTransactions(currentUser.getId(), dateFrom, dateTo)
             .stream().map(txn -> {
                 return TransactionDto.builder().amount(txn.getAmount())
                     .quantity(txn.getQuantity())

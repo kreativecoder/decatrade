@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Builder
@@ -17,5 +17,5 @@ public class TransactionDto {
     private TransactionType transactionType;
     private TransactionStatus transactionStatus;
     private String reference;
-    private LocalDateTime transactionDate;
+    private Date transactionDate;
 }

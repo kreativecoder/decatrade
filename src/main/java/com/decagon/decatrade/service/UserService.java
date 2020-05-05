@@ -10,6 +10,8 @@ public interface UserService {
 
     Optional<User> findByUsername(String username);
 
+    Optional<User> findById(long userId);
+
     UserDto save(UserDto userDto);
 
     String authenticateUser(String username, String password);

@@ -55,6 +55,7 @@ public class UserController {
 
     @GetMapping("/portfolio/summary")
     public ResponseEntity getUserPortfolio(@Valid @RequestBody LoginRequest loginRequest) {
+        //summarize portfolio
         return ok("test");
     }
 }

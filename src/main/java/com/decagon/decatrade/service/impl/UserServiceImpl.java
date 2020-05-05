@@ -33,6 +33,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<User> findById(final long userId) {
+        return userRepository.findById(userId);
+    }
+
+    @Override
     @Transactional
     public UserDto save(UserDto userDto) {
         Optional<User> optionalUser = findByUsername(userDto.getUsername());

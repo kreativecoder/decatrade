@@ -4,6 +4,7 @@ import com.decagon.decatrade.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,4 +15,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     Optional<Transaction> findByReferenceAndUserId(String reference, long userId);
 
     List<Transaction> findByUserId(long userId);
+
+    List<Transaction> findByUserIdAndCreatedAtBetween(long userId, Date from, Date to);
 }

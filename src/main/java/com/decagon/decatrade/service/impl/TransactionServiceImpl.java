@@ -5,15 +5,18 @@ import com.decagon.decatrade.dto.TransactionRequest;
 import com.decagon.decatrade.exception.BadRequestException;
 import com.decagon.decatrade.exception.NotFoundException;
 import com.decagon.decatrade.model.Transaction;
+import com.decagon.decatrade.model.User;
 import com.decagon.decatrade.repository.TransactionRepository;
 import com.decagon.decatrade.service.StockService;
 import com.decagon.decatrade.service.TransactionService;
+import com.decagon.decatrade.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +32,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final IEXServiceImpl iexService;
     private final TransactionRepository transactionRepository;
     private final StockService stockService;
+    private final UserService userService;
 
     @Override
     public QuoteResponse getStockQuote(final String symbol) throws IOException {
@@ -107,8 +111,19 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> getUserTransactions(final long userId) {
-        return transactionRepository.findByUserId(userId);
+    public List<Transaction> getUserTransactions(final long userId, Date dateFrom, Date dateTo) {
+        //if dateFrom is not supplied, start from when user was created
+        if (dateFrom == null) {
+            Optional<User> optionalUser = userService.findById(userId);
+            dateFrom = optionalUser.isPresent() ? optionalUser.get().getCreatedAt() : null;
+        }
+
+        //if dateTo is not supplied, use today
+        if (dateTo == null) {
+            dateTo = new Date();
+        }
+
+        return transactionRepository.findByUserIdAndCreatedAtBetween(userId, dateFrom, dateTo);
     }
 
     private BigDecimal getTotalAmount(long quantity, String symbol) throws IOException {

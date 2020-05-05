@@ -5,6 +5,7 @@ import com.decagon.decatrade.dto.TransactionRequest;
 import com.decagon.decatrade.model.Transaction;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,5 +20,5 @@ public interface TransactionService {
 
     void cancelTransaction(Long userId, String reference) throws IOException;
 
-    List<Transaction> getUserTransactions(long userId);
+    List<Transaction> getUserTransactions(long userId, Date dateFrom, Date dateTo);
 }
