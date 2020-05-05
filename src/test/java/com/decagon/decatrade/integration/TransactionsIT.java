@@ -18,8 +18,10 @@ import static org.apache.http.HttpStatus.SC_ACCEPTED;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -117,35 +119,57 @@ public class TransactionsIT extends BaseIT {
     }
 
     @Test
-    public void testGetUserStocks() {
-        //user has no stocks
-
-        getStocks()
+    public void testCancelTransaction() {
+        //cancel non-existent transaction
+        cancelTransaction("ref")
             .assertThat()
-            .statusCode(SC_OK)
-            .body("$", hasSize(0));
+            .statusCode(SC_NOT_FOUND)
+            .body("code", is("25"),
+                "message", is("Transaction not found."));
 
-        //buy stocks
-        Map<String, String> request = testTransaction("TSLA", 10, "BUY");
-        buyStock(request);
-        request = testTransaction("nflx", 5, "BUY");
-        buyStock(request);
 
-        getStocks()
+        //cancel already completed transaction
+        Map<String, String> request = testTransaction("AAPL", 10, "BUY");
+        buyStock(request);
+        cancelTransaction(request.get("reference"))
             .assertThat()
-            .statusCode(SC_OK)
-            .body("$", hasSize(2));
+            .statusCode(SC_BAD_REQUEST)
+            .body("code", is("30"),
+                "message", is("Transaction already completed."));
+
+
+        //cancel pending transaction
+        request = testTransaction("AAPL", 10, "BUY");
+        createTransaction(request)
+            .assertThat()
+            .statusCode(SC_ACCEPTED)
+            .body("reference", is(request.get("reference")),
+                "$", hasKey("totalAmount"));
+
+        cancelTransaction(request.get("reference"))
+            .assertThat()
+            .statusCode(SC_NO_CONTENT);
     }
 
-    private ValidatableResponse getStocks() {
-        return given()
+    @Test
+    public void testGetAllTransactions() {
+        Map<String, String> request = testTransaction("AAPL", 10, "BUY");
+        buyStock(request);
+        request = testTransaction("nflx", 100, "BUY");
+        buyStock(request);
+        request = testTransaction("nflx", 20, "SELL");
+        buyStock(request);
+
+        given()
             .contentType(JSON)
             .header("Authorization", "Bearer " + authToken)
-            .get("stocks")
-            .then();
+            .get("transactions")
+            .then()
+            .statusCode(SC_OK)
+            .body("$", hasSize(greaterThanOrEqualTo(3))); //cos other tests inserted txns
     }
 
-    private void buyStock(Map<String, String> request) {
+    public void buyStock(Map<String, String> request) {
         createTransaction(request)
             .assertThat()
             .statusCode(SC_ACCEPTED)
@@ -179,7 +203,16 @@ public class TransactionsIT extends BaseIT {
             .then();
     }
 
-    private Map<String, String> testTransaction(String symbol, long quantity, String type) {
+    private ValidatableResponse cancelTransaction(String reference) {
+        //confirm transaction
+        return given()
+            .contentType(JSON)
+            .header("Authorization", "Bearer " + authToken)
+            .delete("transactions/" + reference)
+            .then();
+    }
+
+    public Map<String, String> testTransaction(String symbol, long quantity, String type) {
         Map<String, String> request = new HashMap<>();
         request.put("symbol", symbol);
         request.put("quantity", String.valueOf(quantity));

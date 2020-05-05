@@ -5,6 +5,7 @@ import com.decagon.decatrade.dto.TransactionRequest;
 import com.decagon.decatrade.model.Transaction;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public interface TransactionService {
@@ -15,4 +16,8 @@ public interface TransactionService {
     Transaction save(Long userId, TransactionRequest transactionRequest) throws IOException;
 
     Transaction confirmTransaction(Long userId, String reference) throws IOException;
+
+    void cancelTransaction(Long userId, String reference) throws IOException;
+
+    List<Transaction> getUserTransactions(long userId);
 }

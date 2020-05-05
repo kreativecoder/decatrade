@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
+import static com.decagon.decatrade.dto.TransactionStatus.CANCELLED;
 import static com.decagon.decatrade.dto.TransactionStatus.PENDING;
 import static com.decagon.decatrade.dto.TransactionStatus.SUCCESSFUL;
 import static com.decagon.decatrade.dto.TransactionType.BUY;
@@ -64,28 +66,56 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public Transaction confirmTransaction(final Long userId, final String reference) throws IOException {
-        Optional<Transaction> optionalTransaction = findByReference(reference);
+        Optional<Transaction> optionalTransaction = transactionRepository.findByReferenceAndUserId(reference, userId);
         if (optionalTransaction.isPresent()) {
             Transaction transaction = optionalTransaction.get();
-            transaction.setTransactionStatus(SUCCESSFUL);
+            //only confirm pending transaction
+            if (transaction.getTransactionStatus().equals(PENDING)) {
+                transaction.setTransactionStatus(SUCCESSFUL);
 
-            transaction = transactionRepository.save(transaction);
-            if (transaction.getTransactionType().equals(BUY)) {
-                stockService.buy(transaction);
+                transaction = transactionRepository.save(transaction);
+                if (transaction.getTransactionType().equals(BUY)) {
+                    stockService.buy(transaction);
+                } else {
+                    stockService.sell(transaction);
+                }
+
+                return transaction;
             } else {
-                stockService.sell(transaction);
+                throw new BadRequestException("Transaction already completed.");
             }
-
-            return transaction;
         } else {
             throw new NotFoundException("Transaction not found.");
         }
+    }
+
+    @Override
+    public void cancelTransaction(final Long userId, final String reference) throws IOException {
+        Optional<Transaction> optionalTransaction = transactionRepository.findByReferenceAndUserId(reference, userId);
+        if (optionalTransaction.isPresent()) {
+            Transaction transaction = optionalTransaction.get();
+
+            //only cancel pending transaction
+            if (transaction.getTransactionStatus().equals(PENDING)) {
+                transaction.setTransactionStatus(CANCELLED);
+            } else {
+                throw new BadRequestException("Transaction already completed.");
+            }
+        } else {
+            throw new NotFoundException("Transaction not found.");
+        }
+    }
+
+    @Override
+    public List<Transaction> getUserTransactions(final long userId) {
+        return transactionRepository.findByUserId(userId);
     }
 
     private BigDecimal getTotalAmount(long quantity, String symbol) throws IOException {
         QuoteResponse quoteResponse = getStockQuote(symbol);
         double currentPrice = quoteResponse.getLatestPrice();
 
+        //do gymnastics here to get total cost, add charges and all
         BigDecimal total = BigDecimal.valueOf(currentPrice).multiply(BigDecimal.valueOf(quantity));
 
         return total;

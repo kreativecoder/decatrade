@@ -11,10 +11,12 @@ A simulated stock trading app using price from IEX
 6. Auth0 JWT: For generating and validating JWT tokens
 7. Swagger: For API documentation
 
-##TODO
+##Todo
+
 1. No UI: couldn't implement the frontend part of the task
 2. Payment Integration
 3. Better Exception management / handling
+4. More unit tests: while there are ample IT tests, the unit are few, reverse should be the case.
 
 ## Setup
 

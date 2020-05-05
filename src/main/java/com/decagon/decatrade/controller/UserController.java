@@ -52,4 +52,9 @@ public class UserController {
 
         return ok(model);
     }
+
+    @GetMapping("/portfolio/summary")
+    public ResponseEntity getUserPortfolio(@Valid @RequestBody LoginRequest loginRequest) {
+        return ok("test");
+    }
 }
