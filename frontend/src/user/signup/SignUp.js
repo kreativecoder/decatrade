@@ -12,7 +12,6 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {signup} from "../../decaTradeService";
-import {notifyError, notifySuccess} from "../../util/notifications";
 
 function Copyright() {
     return (
@@ -72,13 +71,13 @@ export default function SignUp(props) {
             .then(response => {
                 setLoading(false);
                 console.log(response.data);
-                notifySuccess("Thank you! You're successfully registered. Please Login to continue!");
+                // notifySuccess("Thank you! You're successfully registered. Please Login to continue!");
                 props.history.push("/login");
             })
             .catch(function (error) {
                 setLoading(false);
                 console.log("Error: " + error.message);
-                notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+                // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
             });
     }
 

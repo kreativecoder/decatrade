@@ -1,5 +1,6 @@
 package com.decagon.decatrade.controller;
 
+import com.decagon.decatrade.dto.QuoteResponse;
 import com.decagon.decatrade.dto.StockDto;
 import com.decagon.decatrade.security.CurrentUser;
 import com.decagon.decatrade.security.UserPrincipal;
@@ -27,10 +28,16 @@ public class StockController {
     @GetMapping
     public ResponseEntity<List<StockDto>> getUserStocks(@CurrentUser UserPrincipal currentUser) throws IOException {
         List<StockDto> stocks = stockService.getAllStocks(currentUser.getId()).stream().map(
-            stock -> new StockDto(stock.getSymbol(), stock.getQuantity())
+            stock -> new StockDto(stock.getSymbol(), stock.getQuantity(), null, null, null, 0)
         ).collect(Collectors.toList());
 
         return ok(stocks);
     }
 
+    @GetMapping("symbols")
+    public ResponseEntity<List<QuoteResponse>> getAllSymbols() throws IOException {
+        List<QuoteResponse> symbols = stockService.getAllSymbols();
+
+        return ok(symbols);
+    }
 }

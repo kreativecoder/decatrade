@@ -1,5 +1,6 @@
 package com.decagon.decatrade.service.impl;
 
+import com.decagon.decatrade.dto.QuoteResponse;
 import com.decagon.decatrade.exception.BadRequestException;
 import com.decagon.decatrade.exception.NotFoundException;
 import com.decagon.decatrade.model.Stock;
@@ -17,6 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
+    private final IEXServiceImpl iexService;
 
 
     @Override
@@ -70,5 +72,10 @@ public class StockServiceImpl implements StockService {
     @Override
     public List<Stock> getAllStocks(final long userId) {
         return stockRepository.findByUserId(userId);
+    }
+
+    @Override
+    public List<QuoteResponse> getAllSymbols() throws IOException {
+        return iexService.getAllSymbols();
     }
 }

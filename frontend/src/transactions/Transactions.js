@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import {makeStyles} from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -10,16 +10,15 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import Chart from './Chart';
-import Deposits from './Deposits';
-import Orders from './Orders';
 import Footer from "../common/Footer";
 import Navigation from "../common/Navigation";
+import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
+import Grid from "@material-ui/core/Grid";
+import {getTransactions} from "../decaTradeService";
 
 const drawerWidth = 240;
 
@@ -100,18 +99,39 @@ const useStyles = makeStyles((theme) => ({
     fixedHeight: {
         height: 240,
     },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 70,
+    },
 }));
 
-export default function Dashboard() {
+export default function Transactions() {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = useState(true);
+    const [transactions, setTransactions] = useState([]);
+
+    useEffect(() => {
+        loadTransactions()
+    }, []);
+
+    const loadTransactions = () => {
+        getTransactions()
+            .then(res => {
+                console.log(res.data)
+                setTransactions(res.data)
+            })
+            .catch(function (error) {
+                console.log(error.message)
+                // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+            });
+    }
+
     const handleDrawerOpen = () => {
         setOpen(true);
     };
     const handleDrawerClose = () => {
         setOpen(false);
     };
-    const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
     return (
         <div className={classes.root}>
@@ -128,7 +148,7 @@ export default function Dashboard() {
                         <MenuIcon/>
                     </IconButton>
                     <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                        Dashboard
+                        Transactions
                     </Typography>
                     <IconButton color="inherit">
                         <Badge badgeContent={4} color="secondary">
@@ -156,22 +176,34 @@ export default function Dashboard() {
                 <div className={classes.appBarSpacer}/>
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
-                        {/* Chart */}
-                        <Grid item xs={12} md={8} lg={9}>
-                            <Paper className={fixedHeightPaper}>
-                                <Chart/>
-                            </Paper>
-                        </Grid>
-                        {/* Recent Deposits */}
-                        <Grid item xs={12} md={4} lg={3}>
-                            <Paper className={fixedHeightPaper}>
-                                <Deposits/>
-                            </Paper>
-                        </Grid>
-                        {/* Recent Orders */}
                         <Grid item xs={12}>
                             <Paper className={classes.paper}>
-                                <Orders/>
+                                <Table className={classes.table} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Symbol</TableCell>
+                                            <TableCell>Quantity</TableCell>
+                                            <TableCell>Amount</TableCell>
+                                            <TableCell>Type</TableCell>
+                                            <TableCell>Status</TableCell>
+                                            <TableCell>reference</TableCell>
+                                            <TableCell>Date</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {transactions.map((transaction) => (
+                                            <TableRow key={transaction.reference}>
+                                                <TableCell>{transaction.symbol}</TableCell>
+                                                <TableCell>{transaction.quantity}</TableCell>
+                                                <TableCell>{transaction.amount}</TableCell>
+                                                <TableCell>{transaction.transactionType}</TableCell>
+                                                <TableCell>{transaction.transactionStatus}</TableCell>
+                                                <TableCell>{transaction.reference}</TableCell>
+                                                <TableCell>{transaction.transactionDate}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
                             </Paper>
                         </Grid>
                     </Grid>

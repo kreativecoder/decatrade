@@ -1,5 +1,6 @@
 package com.decagon.decatrade.service;
 
+import com.decagon.decatrade.dto.QuoteResponse;
 import com.decagon.decatrade.model.Stock;
 import com.decagon.decatrade.model.Transaction;
 
@@ -14,4 +15,6 @@ public interface StockService {
     void validateCanSell(long userId, String symbol, long quantity);
 
     List<Stock> getAllStocks(long userId);
+
+    List<QuoteResponse> getAllSymbols() throws IOException;
 }

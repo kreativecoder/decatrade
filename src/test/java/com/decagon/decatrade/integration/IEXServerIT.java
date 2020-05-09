@@ -10,7 +10,9 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasKey;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -53,5 +55,17 @@ public class IEXServerIT {
             .then()
             .assertThat()
             .statusCode(SC_NOT_FOUND);
+    }
+
+    @Test
+    public void getAllSymbols() {
+        given()
+            .contentType(JSON)
+            .accept(JSON)
+            .get("/ref-data/symbols?token=" + API_TOKEN)
+            .then()
+            .assertThat()
+            .statusCode(SC_OK)
+            .body("$", hasItems(hasEntry("symbol", "AAPL")));
     }
 }

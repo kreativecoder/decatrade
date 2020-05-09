@@ -9,6 +9,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class IEXServiceImpl {
@@ -28,6 +29,16 @@ public class IEXServiceImpl {
 
     public QuoteResponse getStockQuote(String symbol) throws IOException {
         Response<QuoteResponse> response = iexService.getStockQuote(symbol, apiToken).execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null ? response.errorBody().string() : "Unknown error");
+        }
+
+        return response.body();
+    }
+
+    public List<QuoteResponse> getAllSymbols() throws IOException {
+        Response<List<QuoteResponse>> response = iexService.getAllSymbols(apiToken).execute();
 
         if (!response.isSuccessful()) {
             throw new IOException(response.errorBody() != null ? response.errorBody().string() : "Unknown error");

@@ -8,7 +8,6 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import {notifyError, notifySuccess} from "../../util/notifications";
 import {Box, Button, CircularProgress, FormControlLabel, Grid} from "@material-ui/core";
 import {login} from "../../decaTradeService";
 import { ACCESS_TOKEN } from '../../constants';
@@ -55,7 +54,6 @@ export default function Login(props) {
 
     function handleSubmit(e) {
         e.preventDefault()
-        notifySuccess("Login successful!");
         const payload = {
             "username": username,
             "password": password
@@ -67,18 +65,18 @@ export default function Login(props) {
             .then(response => {
                 setLoading(false);
                 console.log(response.data);
-                notifySuccess("Login successful!");
-                localStorage.setItem(ACCESS_TOKEN, response.accessToken);
+                // notifySuccess("Login successful!");
+                localStorage.setItem(ACCESS_TOKEN, response.data.token);
                 props.history.push("/dashboard");
             })
             .catch(function (error) {
                 console.log("Error: " + error.message);
                 if (error.status === 403) {
                     console.log('Your Username or Password is incorrect. Please try again!');
-                    notifyError('Your Username or Password is incorrect. Please try again!');
+                    // notifyError('Your Username or Password is incorrect. Please try again!');
                 } else {
                     setLoading(false);
-                    notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+                    // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
                 }
             });
     }
