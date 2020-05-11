@@ -2,6 +2,7 @@ package com.decagon.decatrade.service;
 
 import com.decagon.decatrade.dto.PortfolioSummary;
 import com.decagon.decatrade.dto.QuoteResponse;
+import com.decagon.decatrade.dto.StockDto;
 import com.decagon.decatrade.dto.TransactionRequest;
 import com.decagon.decatrade.model.Transaction;
 
@@ -24,4 +25,6 @@ public interface TransactionService {
     List<Transaction> getUserTransactions(long userId, Date dateFrom, Date dateTo);
 
     PortfolioSummary getPortfolioSummary(long userId);
+
+    List<StockDto> enrichStockDetails(long userId, List<StockDto> stocks) throws IOException;
 }

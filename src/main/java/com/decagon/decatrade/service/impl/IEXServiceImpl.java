@@ -9,7 +9,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class IEXServiceImpl {
@@ -45,5 +47,19 @@ public class IEXServiceImpl {
         }
 
         return response.body();
+    }
+
+    public Map<String, Double> getBatchPrice(String symbols) throws IOException {
+        HashMap<String, Double> prices = new HashMap<>();
+        Response<Map<String, QuoteResponse>> response = iexService.getBatchPrice(symbols, apiToken).execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null ? response.errorBody().string() : "Unknown error");
+        }
+
+        assert response.body() != null;
+        response.body().forEach((s, q) -> prices.put(s, q.getPrice()));
+
+        return prices;
     }
 }

@@ -2,6 +2,7 @@ package com.decagon.decatrade.service.impl;
 
 import com.decagon.decatrade.dto.PortfolioSummary;
 import com.decagon.decatrade.dto.QuoteResponse;
+import com.decagon.decatrade.dto.StockDto;
 import com.decagon.decatrade.dto.TransactionDto;
 import com.decagon.decatrade.dto.TransactionRequest;
 import com.decagon.decatrade.exception.BadRequestException;
@@ -18,8 +19,11 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -139,6 +143,37 @@ public class TransactionServiceImpl implements TransactionService {
 
         portfolioSummary.setRecentTransactions(recentTransactions);
         return portfolioSummary;
+    }
+
+    @Override
+    public List<StockDto> enrichStockDetails(final long userId, List<StockDto> stocks) throws IOException {
+        if (!stocks.isEmpty()) {
+            List<String> symbols = stocks.stream().map(StockDto::getSymbol).collect(Collectors.toList());
+            Map<String, Double> prices = iexService.getBatchPrice(String.join(",", symbols));
+            List<Map<String, BigDecimal>> amounts = transactionRepository.getAmountPaidByUser(userId);
+            Map<String, BigDecimal> amountMap = new HashMap<>();
+            for (Map amount : amounts) {
+                amountMap.put((String) amount.get("symbol"), (BigDecimal) amount.get("amount"));
+            }
+
+
+            stocks.forEach(stock -> {
+                BigDecimal price = BigDecimal.valueOf(prices.get(stock.getSymbol()));
+                BigDecimal currentValue = price.multiply(BigDecimal.valueOf(stock.getQuantity()));
+                BigDecimal amountPaid = amountMap.get(stock.getSymbol());
+
+                double percentage = currentValue.subtract(amountPaid).divide(amountPaid, 4, RoundingMode.DOWN)
+                    .multiply(BigDecimal.valueOf(100)).doubleValue();
+
+                stock.setLastPrice(price);
+                stock.setCurrentValue(currentValue);
+                stock.setAmountPaid(amountPaid);
+                stock.setCurrentValue(currentValue);
+                stock.setPercentageChange(percentage);
+            });
+        }
+
+        return stocks;
     }
 
     private BigDecimal getTotalAmount(long quantity, String symbol) throws IOException {

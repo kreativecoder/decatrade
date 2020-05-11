@@ -7,6 +7,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IEXService {
 
@@ -15,4 +16,7 @@ public interface IEXService {
 
     @GET("ref-data/symbols")
     Call<List<QuoteResponse>> getAllSymbols(@Query("token") String apiToken);
+
+    @GET("stock/market/batch?types=price")
+    Call<Map<String, QuoteResponse>> getBatchPrice(@Query("symbols") String symbols, @Query("token") String apiToken);
 }

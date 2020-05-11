@@ -5,6 +5,7 @@ import com.decagon.decatrade.dto.StockDto;
 import com.decagon.decatrade.security.CurrentUser;
 import com.decagon.decatrade.security.UserPrincipal;
 import com.decagon.decatrade.service.StockService;
+import com.decagon.decatrade.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequiredArgsConstructor
 public class StockController {
     private final StockService stockService;
+    private final TransactionService transactionService;
 
     @GetMapping
     public ResponseEntity<List<StockDto>> getUserStocks(@CurrentUser UserPrincipal currentUser) throws IOException {
@@ -31,7 +33,7 @@ public class StockController {
             stock -> new StockDto(stock.getSymbol(), stock.getQuantity(), null, null, null, 0)
         ).collect(Collectors.toList());
 
-        return ok(stocks);
+        return ok(transactionService.enrichStockDetails(currentUser.getId(), stocks));
     }
 
     @GetMapping("symbols")

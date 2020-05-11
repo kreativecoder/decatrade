@@ -17,8 +17,8 @@ import static org.hamcrest.Matchers.hasKey;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class IEXServerIT {
-    private static final String BASE_URI = "https://cloud.iexapis.com/stable/";
-    private static final String API_TOKEN = "pk_d024f60c01db434ebcc6a3aa20baeaf3";
+    private static final String BASE_URI = "https://sandbox.iexapis.com/stable/";
+    private static final String API_TOKEN = "Tsk_2345bb23976943989ea7c996c99e49f5";
 
     @BeforeAll
     void setup() {
@@ -42,7 +42,6 @@ public class IEXServerIT {
             .assertThat()
             .statusCode(SC_OK)
             .body("symbol", is("NFLX"),
-                "primaryExchange", is("NASDAQ"),
                 "$", hasKey("latestPrice"));
     }
 
@@ -67,5 +66,21 @@ public class IEXServerIT {
             .assertThat()
             .statusCode(SC_OK)
             .body("$", hasItems(hasEntry("symbol", "AAPL")));
+    }
+
+    @Test
+    public void testGetMultipleStockPrices() {
+        given()
+            .queryParam("symbols", "AAPL, FB")
+            .queryParam("types", "price")
+            .queryParam("token", API_TOKEN)
+            .contentType(JSON)
+            .accept(JSON)
+            .get("/stock/market/batch")
+            .then()
+            .assertThat()
+            .statusCode(SC_OK)
+            .body("AAPL", hasKey("price"),
+                "FB", hasKey("price"));
     }
 }

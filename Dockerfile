@@ -1,5 +1,7 @@
-#build
-FROM openjdk:8-jdk-alpine as build
+#frontend
+
+#server build
+FROM maven:3-jdk-8 as build
 
 WORKDIR /app
 

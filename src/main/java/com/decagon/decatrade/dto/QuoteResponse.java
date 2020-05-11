@@ -12,4 +12,5 @@ public class QuoteResponse {
     private String companyName;
     private double latestPrice;
     private String name;
+    private double price;
 }
