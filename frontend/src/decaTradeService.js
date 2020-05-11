@@ -1,55 +1,55 @@
 import axios from 'axios'
-import {API_BASE_URL} from "./constants";
+import {API_BASE_PATH} from "./constants";
 
 export function checkUsername(username) {
-    return axios.get(API_BASE_URL + '/users/check?username=' + username);
+    return axios.get(API_BASE_PATH + '/users/check?username=' + username);
 }
 
 export function signup(payload) {
-    return axios.post(API_BASE_URL + '/users', payload);
+    return axios.post(API_BASE_PATH + '/users', payload);
 }
 
 export function login(payload) {
-    return axios.post(API_BASE_URL + '/users/login', payload);
+    return axios.post(API_BASE_PATH + '/users/login', payload);
 }
 
 export function getStocks() {
     setAuthToken()
-    return axios.get(API_BASE_URL + '/stocks');
+    return axios.get(API_BASE_PATH + '/stocks');
 }
 
 export function getAllSymbols() {
-    return axios.get(API_BASE_URL + '/stocks/symbols');
+    return axios.get(API_BASE_PATH + '/stocks/symbols');
 }
 
 export function initiateTransaction(payload) {
     setAuthToken()
-    return axios.post(API_BASE_URL + '/transactions', payload);
+    return axios.post(API_BASE_PATH + '/transactions', payload);
 }
 
 export function confirmTransaction(reference) {
     setAuthToken()
-    return axios.get(API_BASE_URL + '/transactions/confirm?reference=' + reference);
+    return axios.get(API_BASE_PATH + '/transactions/confirm?reference=' + reference);
 }
 
 export function cancelTransaction(reference) {
     setAuthToken()
-    return axios.delete(API_BASE_URL + '/transactions/' + reference);
+    return axios.delete(API_BASE_PATH + '/transactions/' + reference);
 }
 
 export function getTransactions() {
     setAuthToken()
-    return axios.get(API_BASE_URL + '/transactions');
+    return axios.get(API_BASE_PATH + '/transactions');
 }
 
 export function getCurrentUser() {
     setAuthToken()
-    return axios.get(API_BASE_URL + '/users/current');
+    return axios.get(API_BASE_PATH + '/users/current');
 }
 
 export function getUserPortfolioSummary() {
     setAuthToken()
-    return axios.get(API_BASE_URL + '/users/portfolio/summary');
+    return axios.get(API_BASE_PATH + '/users/portfolio/summary');
 }
 
 export function setAuthToken() {

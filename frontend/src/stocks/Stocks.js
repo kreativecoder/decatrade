@@ -108,7 +108,7 @@ export default function Stocks(props) {
             "symbol": symbol,
             "quantity": quantity,
             "transactionType": tranType,
-            "reference": `UI_${tranType}_${Date.now()}`
+            "reference": `Deca|${tranType}|${Date.now()}`
         }
         initiateTransaction(payload)
             .then(res => {
