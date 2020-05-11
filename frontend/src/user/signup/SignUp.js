@@ -13,6 +13,7 @@ import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {signup} from "../../decaTradeService";
 import {isAuthenticated} from "../../common/AuthService";
+import {useSnackbar} from "notistack";
 
 function Copyright() {
     return (
@@ -50,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp(props) {
 
-    if(isAuthenticated()) {
+    if (isAuthenticated()) {
         props.history.push("/")
     }
 
@@ -61,6 +62,7 @@ export default function SignUp(props) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const {enqueueSnackbar} = useSnackbar();
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -76,14 +78,12 @@ export default function SignUp(props) {
         signup(payload)
             .then(response => {
                 setLoading(false);
-                console.log(response.data);
-                // notifySuccess("Thank you! You're successfully registered. Please Login to continue!");
+                enqueueSnackbar("Thank you! You're successfully registered. Please Login to continue!", {variant: 'success'});
                 props.history.push("/login");
             })
             .catch(function (error) {
                 setLoading(false);
-                console.log("Error: " + error.message);
-                // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+                enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
             });
     }
 

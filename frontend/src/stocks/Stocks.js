@@ -17,6 +17,7 @@ import {
 import Trade from "./Trade";
 import Complete from "./Complete";
 import Header from "../common/Header";
+import {useSnackbar} from "notistack";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -57,6 +58,7 @@ export default function Stocks(props) {
     const [openCompleteTransaction, setOpenCompleteTransaction] = useState(false);
     const [transactionRes, setTransactionRes] = useState({});
     const [tradeType, setTradeTye] = useState(2);
+    const {enqueueSnackbar} = useSnackbar();
 
     useEffect(() => {
         loadStocks()
@@ -79,28 +81,24 @@ export default function Stocks(props) {
     const handleConfirmTransaction = () => {
         confirmTransaction(transactionRes.reference)
             .then(res => {
-                console.log(res.data)
-                // notifySuccess('Transaction Successful!')
+                enqueueSnackbar(`Transaction ${res.data.reference} successful.`, {variant: 'success'});
                 setOpenCompleteTransaction(false)
                 loadStocks()
             })
             .catch(function (error) {
-                console.log(error.message)
-                // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+                enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
             });
     };
 
     const handleCancelTransaction = () => {
         cancelTransaction(transactionRes.reference)
             .then(res => {
-                console.log(res.data)
-                // notifySuccess('Transaction Cancelled!')
+                enqueueSnackbar(`Transaction Cancelled!`, {variant: 'info'});
                 setOpenCompleteTransaction(false)
                 loadStocks()
             })
             .catch(function (error) {
-                console.log(error.message)
-                // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+                enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
             });
     };
 
@@ -114,20 +112,18 @@ export default function Stocks(props) {
         }
         initiateTransaction(payload)
             .then(res => {
-                console.log(res.data)
                 setTransactionRes(res.data)
                 setOpenTrade(false);
                 setOpenCompleteTransaction(true)
             })
             .catch(function (error) {
-                console.log(error.message)
-                // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+                enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
             });
     };
 
     const handleClickBuy = (type) => {
         if (type === 3) {
-            setTradeTye(tradeType)
+            setTradeTye(type)
             setOpenTrade(true);
         } else {
             getAllSymbols()
@@ -135,11 +131,11 @@ export default function Stocks(props) {
                     console.log(res.data)
                     setAllSymbols(res.data)
                     setSymbol(res.data[0].symbol);
-                    setTradeTye(tradeType)
+                    setTradeTye(type)
                     setOpenTrade(true);
                 })
                 .catch(function (error) {
-                    // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+                    enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
                 });
         }
     };
@@ -219,7 +215,7 @@ export default function Stocks(props) {
                                                 <TableCell>{stock.amountPaid}</TableCell>
                                                 <TableCell>{stock.percentageChange}</TableCell>
                                                 <TableCell align="right"
-                                                           onClick={event => handleClick(event, stock, 2)}><Button
+                                                           onClick={event => handleClick(event, stock, 3)}><Button
                                                     size="small" variant="contained" color="primary">
                                                     BUY
                                                 </Button>

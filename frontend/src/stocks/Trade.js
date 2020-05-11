@@ -29,16 +29,15 @@ export default function Trade(props) {
         symbol, tradeType, quantity
     } = props;
 
+    console.log(tradeType)
+
     return (
         <Dialog disableBackdropClick={true} disableEscapeKeyDown={true} open={openTradeStock}
                 onClose={handleClose} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">{tradeType === 1 ? 'Sell' : 'Buy'} Stock</DialogTitle>
             <DialogContent>
-                {/*<DialogContentText>*/}
-                {/*    { tradeType === 0 ? 'Buy' : 'Sell'} Stock*/}
-                {/*</DialogContentText>*/}
                 <form className={classes.container}>
-                    {tradeType === 3 && <FormControl variant="outlined" className={classes.formControl}>
+                    {tradeType === 2 && <FormControl variant="outlined" className={classes.formControl}>
                         <InputLabel htmlFor="demo-dialog-native">Company</InputLabel>
                         <Select
                             native

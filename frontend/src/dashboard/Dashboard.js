@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -6,9 +6,10 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Chart from './Chart';
 import Deposits from './Deposits';
-import Orders from './Orders';
+import RecentTransactions from './RecentTransactions';
 import Footer from "../common/Footer";
 import Header from "../common/Header";
+import {getUserPortfolioSummary} from "../decaTradeService";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -39,6 +40,23 @@ const useStyles = makeStyles((theme) => ({
 export default function Dashboard(props) {
     const classes = useStyles();
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+    const [summary, setSummary] = useState({});
+
+    useEffect(() => {
+        loadSummary()
+    }, []);
+
+    const loadSummary = () => {
+        getUserPortfolioSummary()
+            .then(res => {
+                console.log(res.data)
+                setSummary(res.data)
+            })
+            .catch(function (error) {
+                console.log(error.message)
+                // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+            });
+    }
 
     return (
         <div className={classes.root}>
@@ -59,10 +77,10 @@ export default function Dashboard(props) {
                                 <Deposits/>
                             </Paper>
                         </Grid>
-                        {/* Recent Orders */}
+                        {/* Recent RecentTransactions */}
                         <Grid item xs={12}>
                             <Paper className={classes.paper}>
-                                <Orders/>
+                                <RecentTransactions transactions={summary.recentTransactions}/>
                             </Paper>
                         </Grid>
                     </Grid>

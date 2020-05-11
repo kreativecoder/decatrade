@@ -1,6 +1,8 @@
 package com.decagon.decatrade.service.impl;
 
+import com.decagon.decatrade.dto.PortfolioSummary;
 import com.decagon.decatrade.dto.QuoteResponse;
+import com.decagon.decatrade.dto.TransactionDto;
 import com.decagon.decatrade.dto.TransactionRequest;
 import com.decagon.decatrade.exception.BadRequestException;
 import com.decagon.decatrade.exception.NotFoundException;
@@ -19,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.decagon.decatrade.dto.TransactionStatus.CANCELLED;
 import static com.decagon.decatrade.dto.TransactionStatus.PENDING;
@@ -125,6 +128,17 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         return transactionRepository.findByUserIdAndCreatedAtBetween(userId, dateFrom, dateTo);
+    }
+
+    @Override
+    public PortfolioSummary getPortfolioSummary(final long userId) {
+        PortfolioSummary portfolioSummary = new PortfolioSummary();
+        List<TransactionDto> recentTransactions = transactionRepository.findTop5ByUserIdOrderByCreatedAtDesc(userId)
+            .stream().map(TransactionDto::fromTransaction).collect(Collectors.toList());
+
+
+        portfolioSummary.setRecentTransactions(recentTransactions);
+        return portfolioSummary;
     }
 
     private BigDecimal getTotalAmount(long quantity, String symbol) throws IOException {

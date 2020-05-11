@@ -2,11 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Footer from "../common/Footer";
-import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import Grid from "@material-ui/core/Grid";
 import {getTransactions} from "../decaTradeService";
 import Header from "../common/Header";
+import TransactionTable from "./TransactionTable";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -66,32 +66,7 @@ export default function Transactions(props) {
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
                             <Paper className={classes.paper}>
-                                <Table className={classes.table} aria-label="simple table">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Symbol</TableCell>
-                                            <TableCell>Quantity</TableCell>
-                                            <TableCell>Amount</TableCell>
-                                            <TableCell>Type</TableCell>
-                                            <TableCell>Status</TableCell>
-                                            <TableCell>reference</TableCell>
-                                            <TableCell>Date</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {transactions.map((transaction) => (
-                                            <TableRow key={transaction.reference}>
-                                                <TableCell>{transaction.symbol}</TableCell>
-                                                <TableCell>{transaction.quantity}</TableCell>
-                                                <TableCell>{transaction.totalAmount}</TableCell>
-                                                <TableCell>{transaction.transactionType}</TableCell>
-                                                <TableCell>{transaction.transactionStatus}</TableCell>
-                                                <TableCell>{transaction.reference}</TableCell>
-                                                <TableCell>{transaction.transactionDate}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                <TransactionTable transactions={transactions}/>
                             </Paper>
                         </Grid>
                     </Grid>

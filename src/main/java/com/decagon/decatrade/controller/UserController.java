@@ -1,6 +1,7 @@
 package com.decagon.decatrade.controller;
 
 import com.decagon.decatrade.dto.LoginRequest;
+import com.decagon.decatrade.dto.PortfolioSummary;
 import com.decagon.decatrade.dto.Response;
 import com.decagon.decatrade.dto.UserDto;
 import com.decagon.decatrade.exception.BadRequestException;
@@ -8,6 +9,7 @@ import com.decagon.decatrade.exception.NotFoundException;
 import com.decagon.decatrade.model.User;
 import com.decagon.decatrade.security.CurrentUser;
 import com.decagon.decatrade.security.UserPrincipal;
+import com.decagon.decatrade.service.TransactionService;
 import com.decagon.decatrade.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final TransactionService transactionService;
 
     @GetMapping("check")
     public ResponseEntity<Response> checkUserName(@RequestParam(value = "username") String username) {
@@ -59,9 +62,8 @@ public class UserController {
     }
 
     @GetMapping("/portfolio/summary")
-    public ResponseEntity getUserPortfolio(@Valid @RequestBody LoginRequest loginRequest) {
-        //summarize portfolio
-        return ok("test");
+    public PortfolioSummary getUserPortfolio(@CurrentUser UserPrincipal currentUser) {
+        return transactionService.getPortfolioSummary(currentUser.getId());
     }
 
     @GetMapping("current")

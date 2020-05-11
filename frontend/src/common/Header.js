@@ -15,6 +15,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import {ACCESS_TOKEN} from "../constants";
 import {useHistory} from "react-router-dom";
 import {getCurrentUser} from "../decaTradeService";
+import {useSnackbar} from "notistack";
 
 
 const drawerWidth = 240;
@@ -103,6 +104,7 @@ export default function Header(props) {
     const [open, setOpen] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
     const history = useHistory();
+    const {enqueueSnackbar} = useSnackbar();
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -118,25 +120,18 @@ export default function Header(props) {
     const loadCurrentUser = () => {
         getCurrentUser()
             .then(response => {
-                // setLoading(false)
                 setCurrentUser(response.data)
             })
             .catch(error => {
                 console.log(error.message)
-                // setLoading(false);
             });
     }
 
 
     const handleLogout = () => {
         localStorage.removeItem(ACCESS_TOKEN);
-
         history.push("/");
-
-        // notification[notificationType]({
-        //     message: 'Polling App',
-        //     description: description,
-        // });
+        enqueueSnackbar("You're successfully logged out.", {variant: 'success'});
     }
 
     return (

@@ -13,6 +13,7 @@ import {login} from "../../decaTradeService";
 import {ACCESS_TOKEN} from '../../constants';
 import {useHistory} from "react-router-dom";
 import {isAuthenticated} from "../../common/AuthService";
+import {useSnackbar} from "notistack";
 
 function Copyright() {
     return (
@@ -54,7 +55,7 @@ export default function Login(props) {
     }
 
     const classes = useStyles();
-
+    const {enqueueSnackbar} = useSnackbar();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -72,19 +73,17 @@ export default function Login(props) {
         login(payload)
             .then(response => {
                 setLoading(false);
-                console.log(response.data);
-                // notifySuccess("Login successful!");
+                enqueueSnackbar("Login successful.", {variant: 'success'});
                 localStorage.setItem(ACCESS_TOKEN, response.data.token);
                 history.push("/dashboard");
             })
             .catch(function (error) {
                 console.log("Error: " + error.message);
                 if (error.status === 403) {
-                    console.log('Your Username or Password is incorrect. Please try again!');
-                    // notifyError('Your Username or Password is incorrect. Please try again!');
+                    enqueueSnackbar("Your Username or Password is incorrect. Please try again!", {variant: 'error'});
                 } else {
                     setLoading(false);
-                    // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+                    enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
                 }
             });
     }

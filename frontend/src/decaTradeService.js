@@ -47,6 +47,11 @@ export function getCurrentUser() {
     return axios.get(API_BASE_URL + '/users/current');
 }
 
+export function getUserPortfolioSummary() {
+    setAuthToken()
+    return axios.get(API_BASE_URL + '/users/portfolio/summary');
+}
+
 export function setAuthToken() {
     const token = localStorage.getItem('access_token');
     axios.defaults.headers.common['Authorization'] = '';

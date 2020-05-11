@@ -6,9 +6,9 @@ import Dashboard from "./dashboard/Dashboard";
 import Stocks from "./stocks/Stocks";
 import Transactions from "./transactions/Transactions"
 import PrivateRoute from "./common/PrivateRoute";
+import {SnackbarProvider} from 'notistack';
 
-export default function App(props) {
-
+function App() {
     return (
         <Router>
             <Switch>
@@ -22,3 +22,16 @@ export default function App(props) {
         </Router>
     );
 }
+
+export default () => (
+    <SnackbarProvider
+        maxSnack={3}
+        anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+        }}
+        autoHideDuration={3000}
+    >
+        <App/>
+    </SnackbarProvider>
+);

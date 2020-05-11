@@ -17,4 +17,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByUserId(long userId);
 
     List<Transaction> findByUserIdAndCreatedAtBetween(long userId, Date from, Date to);
+
+    List<Transaction> findTop5ByUserIdOrderByCreatedAtDesc(long userId);
 }
