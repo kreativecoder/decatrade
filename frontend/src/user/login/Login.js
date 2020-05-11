@@ -11,6 +11,8 @@ import Container from '@material-ui/core/Container';
 import {Box, Button, CircularProgress, FormControlLabel, Grid} from "@material-ui/core";
 import {login} from "../../decaTradeService";
 import { ACCESS_TOKEN } from '../../constants';
+import {useHistory} from "react-router-dom";
+import {isAuthenticated} from "../../common/AuthService";
 
 function Copyright() {
     return (
@@ -46,11 +48,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Login(props) {
+
+    if(isAuthenticated()) {
+        props.history.push("/")
+    }
+
     const classes = useStyles();
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    let history = useHistory();
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -67,7 +75,8 @@ export default function Login(props) {
                 console.log(response.data);
                 // notifySuccess("Login successful!");
                 localStorage.setItem(ACCESS_TOKEN, response.data.token);
-                props.history.push("/dashboard");
+                props.postLogin();
+                history.push("/dashboard");
             })
             .catch(function (error) {
                 console.log("Error: " + error.message);

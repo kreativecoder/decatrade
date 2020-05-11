@@ -105,7 +105,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Transactions() {
+export default function Transactions(props) {
     const classes = useStyles();
     const [open, setOpen] = useState(true);
     const [transactions, setTransactions] = useState([]);
@@ -195,7 +195,7 @@ export default function Transactions() {
                                             <TableRow key={transaction.reference}>
                                                 <TableCell>{transaction.symbol}</TableCell>
                                                 <TableCell>{transaction.quantity}</TableCell>
-                                                <TableCell>{transaction.amount}</TableCell>
+                                                <TableCell>{transaction.totalAmount}</TableCell>
                                                 <TableCell>{transaction.transactionType}</TableCell>
                                                 <TableCell>{transaction.transactionStatus}</TableCell>
                                                 <TableCell>{transaction.reference}</TableCell>

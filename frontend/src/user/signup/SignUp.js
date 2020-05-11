@@ -12,6 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {signup} from "../../decaTradeService";
+import {isAuthenticated} from "../../common/AuthService";
 
 function Copyright() {
     return (
@@ -48,6 +49,11 @@ const useStyles = makeStyles((theme) => ({
 
 
 export default function SignUp(props) {
+
+    if(isAuthenticated()) {
+        props.history.push("/")
+    }
+
     const classes = useStyles();
 
     const [firstName, setFirstName] = useState("");

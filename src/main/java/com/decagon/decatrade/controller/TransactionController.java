@@ -3,7 +3,6 @@ package com.decagon.decatrade.controller;
 import com.decagon.decatrade.dto.QuoteResponse;
 import com.decagon.decatrade.dto.TransactionDto;
 import com.decagon.decatrade.dto.TransactionRequest;
-import com.decagon.decatrade.dto.TransactionResponse;
 import com.decagon.decatrade.model.Transaction;
 import com.decagon.decatrade.security.CurrentUser;
 import com.decagon.decatrade.security.UserPrincipal;
@@ -48,15 +47,15 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<TransactionResponse> createTransaction(@CurrentUser UserPrincipal currentUser, @Valid @RequestBody TransactionRequest transactionRequest) throws IOException {
+    public ResponseEntity<TransactionDto> createTransaction(@CurrentUser UserPrincipal currentUser, @Valid @RequestBody TransactionRequest transactionRequest) throws IOException {
         Transaction transaction = transactionService.save(currentUser.getId(), transactionRequest);
-        return new ResponseEntity<>(new TransactionResponse(transaction.getReference(), transaction.getAmount()), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(TransactionDto.fromTransaction(transaction), HttpStatus.ACCEPTED);
     }
 
     @GetMapping("confirm")
-    public ResponseEntity<TransactionResponse> confirmTransaction(@CurrentUser UserPrincipal currentUser, @Query("reference") String reference) throws IOException {
+    public ResponseEntity<TransactionDto> confirmTransaction(@CurrentUser UserPrincipal currentUser, @Query("reference") String reference) throws IOException {
         Transaction transaction = transactionService.confirmTransaction(currentUser.getId(), reference);
-        return new ResponseEntity<>(new TransactionResponse(transaction.getReference(), transaction.getAmount()), HttpStatus.CREATED);
+        return new ResponseEntity<>(TransactionDto.fromTransaction(transaction), HttpStatus.CREATED);
     }
 
     @DeleteMapping("{reference}")
@@ -70,15 +69,7 @@ public class TransactionController {
                                                                 @RequestParam(name = "from", required = false) @DateTimeFormat(iso = DATE, pattern = "dd.MM.yyyy") Date dateFrom,
                                                                 @RequestParam(name = "to", required = false) @DateTimeFormat(iso = DATE, pattern = "dd.MM.yyyy") Date dateTo) {
         List<TransactionDto> transactions = transactionService.getUserTransactions(currentUser.getId(), dateFrom, dateTo)
-            .stream().map(txn -> {
-                return TransactionDto.builder().amount(txn.getAmount())
-                    .quantity(txn.getQuantity())
-                    .symbol(txn.getSymbol())
-                    .reference(txn.getReference())
-                    .transactionType(txn.getTransactionType())
-                    .transactionStatus(txn.getTransactionStatus())
-                    .transactionDate(txn.getCreatedAt()).build();
-            }).collect(Collectors.toList());
+            .stream().map(TransactionDto::fromTransaction).collect(Collectors.toList());
 
         return ok(transactions);
     }

@@ -4,6 +4,10 @@ import com.decagon.decatrade.dto.LoginRequest;
 import com.decagon.decatrade.dto.Response;
 import com.decagon.decatrade.dto.UserDto;
 import com.decagon.decatrade.exception.BadRequestException;
+import com.decagon.decatrade.exception.NotFoundException;
+import com.decagon.decatrade.model.User;
+import com.decagon.decatrade.security.CurrentUser;
+import com.decagon.decatrade.security.UserPrincipal;
 import com.decagon.decatrade.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -57,5 +62,11 @@ public class UserController {
     public ResponseEntity getUserPortfolio(@Valid @RequestBody LoginRequest loginRequest) {
         //summarize portfolio
         return ok("test");
+    }
+
+    @GetMapping("current")
+    public UserDto getCurrentUser(@CurrentUser UserPrincipal currentUser) {
+        Optional<User> optionalUser = userService.findById(currentUser.getId());
+        return optionalUser.map(UserDto::fromUser).orElseThrow(() -> new NotFoundException("User not found."));
     }
 }

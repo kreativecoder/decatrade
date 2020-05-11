@@ -19,16 +19,6 @@ import {Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/cor
 import Paper from '@material-ui/core/Paper';
 import Grid from "@material-ui/core/Grid";
 import Button from '@material-ui/core/Button';
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import TextField from "@material-ui/core/TextField";
-import DialogActions from "@material-ui/core/DialogActions";
-import Dialog from "@material-ui/core/Dialog";
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import {
     cancelTransaction,
     confirmTransaction,
@@ -36,6 +26,8 @@ import {
     getStocks,
     initiateTransaction
 } from "../decaTradeService";
+import Trade from "./Trade";
+import Complete from "./Complete";
 
 const drawerWidth = 240;
 
@@ -122,16 +114,17 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Stocks() {
+export default function Stocks(props) {
     const classes = useStyles();
     const [open, setOpen] = useState(true);
     const [symbol, setSymbol] = useState('');
-    const [quantity, setQuantity] = useState('');
+    const [quantity, setQuantity] = useState(0);
     const [allSymbols, setAllSymbols] = useState([]);
     const [stocks, setStocks] = useState([]);
-    const [openBuyStock, setOpenBuyStock] = useState(false);
+    const [openTrade, setOpenTrade] = useState(false);
     const [openCompleteTransaction, setOpenCompleteTransaction] = useState(false);
     const [transactionRes, setTransactionRes] = useState({});
+    const [tradeType, setTradeTye] = useState(2);
 
     useEffect(() => {
         loadStocks()
@@ -150,11 +143,6 @@ export default function Stocks() {
                 // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
             });
     }
-
-    const handleChange = (event) => {
-        //get symbol
-        setSymbol(event.target.value || '');
-    };
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -191,18 +179,19 @@ export default function Stocks() {
             });
     };
 
-    const handleBuy = () => {
+    const handleInitiateTransaction = () => {
+        const tranType = tradeType === 1 ? 'SELL' : 'BUY';
         const payload = {
             "symbol": symbol,
             "quantity": quantity,
-            "transactionType": "BUY",
-            "reference": "UI_" + Date.now()
+            "transactionType": tranType,
+            "reference": `UI_${tranType}_${Date.now()}`
         }
         initiateTransaction(payload)
             .then(res => {
                 console.log(res.data)
                 setTransactionRes(res.data)
-                setOpenBuyStock(false);
+                setOpenTrade(false);
                 setOpenCompleteTransaction(true)
             })
             .catch(function (error) {
@@ -211,22 +200,42 @@ export default function Stocks() {
             });
     };
 
-    const handleClickOpen = () => {
-        getAllSymbols()
-            .then(res => {
-                console.log(res.data)
-                setAllSymbols(res.data)
-                setSymbol(res.data[0].symbol);
-                setOpenBuyStock(true);
-            })
-            .catch(function (error) {
-                // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
-            });
+    const handleClickBuy = (type) => {
+        if (type === 3) {
+            setTradeTye(tradeType)
+            setOpenTrade(true);
+        } else {
+            getAllSymbols()
+                .then(res => {
+                    console.log(res.data)
+                    setAllSymbols(res.data)
+                    setSymbol(res.data[0].symbol);
+                    setTradeTye(tradeType)
+                    setOpenTrade(true);
+                })
+                .catch(function (error) {
+                    // notifyError(error.message || 'Sorry! Something went wrong. Please try again!');
+                });
+        }
+    };
 
+    const handleClickSell = (tradeType, quantity) => {
+        setTradeTye(tradeType)
+        setQuantity(quantity)
+        setOpenTrade(true);
+    };
+
+    const handleClick = (event, stock, action) => {
+        setSymbol(stock.symbol);
+        if (action === 3) {
+            handleClickBuy(action)
+        } else {
+            handleClickSell(action, stock.quantity)
+        }
     };
 
     const handleClose = () => {
-        setOpenBuyStock(false);
+        setOpenTrade(false);
     };
 
     return (
@@ -274,87 +283,23 @@ export default function Stocks() {
                     <Grid container spacing={3}>
                         <Grid item xs={2}>
                             <Paper className={classes.paper}>
-                                <Button variant="contained" color="primary" onClick={handleClickOpen}>
+                                <Button variant="contained" color="primary" onClick={() => handleClickBuy(2)}>
                                     Buy Stock
                                 </Button>
-                                <Dialog disableBackdropClick={true} disableEscapeKeyDown={true} open={openBuyStock}
-                                        onClose={handleClose} aria-labelledby="form-dialog-title">
-                                    <DialogTitle id="form-dialog-title">Buy Stock</DialogTitle>
-                                    <DialogContent>
-                                        <DialogContentText>
-                                            Stock purchase order
-                                        </DialogContentText>
-                                        <form className={classes.container}>
-                                            <FormControl variant="outlined" className={classes.formControl}>
-                                                <InputLabel htmlFor="demo-dialog-native">Company</InputLabel>
-                                                <Select
-                                                    native
-                                                    value={symbol}
-                                                    onChange={handleChange}
-                                                    input={<Input id="demo-dialog-native"/>}
-                                                >
-                                                    {allSymbols.map(s => <option key={s.symbol}
-                                                                                 value={s.symbol}>{s.name}</option>)}
-                                                </Select>
-                                            </FormControl>
-                                            <TextField
-                                                autoFocus
-                                                variant="outlined"
-                                                margin="normal"
-                                                required
-                                                id="symbol"
-                                                name="symbol"
-                                                label="Symbol"
-                                                value={symbol}
-                                                fullWidth
-                                            />
-                                            <TextField
-                                                autoFocus
-                                                variant="outlined"
-                                                margin="normal"
-                                                required
-                                                id="quantity"
-                                                name="quantity"
-                                                label="Quantity"
-                                                type="number"
-                                                fullWidth
-                                                onChange={e => setQuantity(e.target.value)}
-                                            />
-                                        </form>
+                                <Trade openTradeStock={openTrade} setSymbol={setSymbol}
+                                       handleClose={handleClose}
+                                       setQuantity={setQuantity}
+                                       allSymbols={allSymbols}
+                                       symbol={symbol}
+                                       handleInitiateTransaction={handleInitiateTransaction}
+                                       tradeType={tradeType}
+                                       quantity={quantity}/>
 
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Button onClick={handleClose} color="primary">
-                                            Cancel
-                                        </Button>
-                                        <Button onClick={handleBuy} color="primary">
-                                            Buy
-                                        </Button>
-                                    </DialogActions>
-                                </Dialog>
-                                <Dialog
-                                    disableBackdropClick={true}
-                                    disableEscapeKeyDown={true}
-                                    open={openCompleteTransaction}
-                                    onClose={handleClose}
-                                    aria-labelledby="alert-dialog-title"
-                                    aria-describedby="alert-dialog-description"
-                                >
-                                    <DialogTitle id="alert-dialog-title">{"Complete Transaction"}</DialogTitle>
-                                    <DialogContent>
-                                        <DialogContentText id="alert-dialog-description">
-                                            The total cost of this transaction is {transactionRes.totalAmount}, proceed?
-                                        </DialogContentText>
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Button onClick={handleCancelTransaction} color="secondary">
-                                            Cancel
-                                        </Button>
-                                        <Button onClick={handleConfirmTransaction} color="primary" autoFocus>
-                                            Confirm
-                                        </Button>
-                                    </DialogActions>
-                                </Dialog>
+                                <Complete openCompleteTransaction={openCompleteTransaction}
+                                          transaction={transactionRes}
+                                          handleCancelTransaction={handleCancelTransaction}
+                                          handleConfirmTransaction={handleConfirmTransaction}
+                                />
                             </Paper>
                         </Grid>
 
@@ -383,9 +328,14 @@ export default function Stocks() {
                                                 <TableCell>{stock.currentValue}</TableCell>
                                                 <TableCell>{stock.amountPaid}</TableCell>
                                                 <TableCell>{stock.percentageChange}</TableCell>
-                                                <TableCell><Button size="small" variant="contained" color="primary">
+                                                <TableCell align="right"
+                                                           onClick={event => handleClick(event, stock, 2)}><Button
+                                                    size="small" variant="contained" color="primary">
                                                     BUY
                                                 </Button>
+                                                </TableCell>
+                                                <TableCell
+                                                    onClick={event => handleClick(event, stock, 1)}>
                                                     <Button size="small" variant="contained" color="secondary">
                                                         SELL
                                                     </Button>

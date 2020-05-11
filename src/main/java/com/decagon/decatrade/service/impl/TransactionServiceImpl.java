@@ -102,6 +102,7 @@ public class TransactionServiceImpl implements TransactionService {
             //only cancel pending transaction
             if (transaction.getTransactionStatus().equals(PENDING)) {
                 transaction.setTransactionStatus(CANCELLED);
+                transactionRepository.save(transaction);
             } else {
                 throw new BadRequestException("Transaction already completed.");
             }

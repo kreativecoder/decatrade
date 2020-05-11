@@ -42,6 +42,11 @@ export function getTransactions() {
     return axios.get(API_BASE_URL + '/transactions');
 }
 
+export function getCurrentUser() {
+    setAuthToken()
+    return axios.get(API_BASE_URL + '/users/current');
+}
+
 export function setAuthToken() {
     const token = localStorage.getItem('access_token');
     axios.defaults.headers.common['Authorization'] = '';
