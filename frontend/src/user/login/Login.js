@@ -14,6 +14,7 @@ import {ACCESS_TOKEN} from '../../constants';
 import {useHistory} from "react-router-dom";
 import {isAuthenticated} from "../../common/AuthService";
 import {useSnackbar} from "notistack";
+import Footer from "../../common/Footer";
 
 function Copyright() {
     return (
@@ -78,7 +79,7 @@ export default function Login(props) {
                 history.push("/dashboard");
             })
             .catch(function (error) {
-                console.log("Error: " + error.message);
+                console.log(error);
                 if (error.status === 403) {
                     enqueueSnackbar("Your Username or Password is incorrect. Please try again!", {variant: 'error'});
                 } else {
@@ -152,9 +153,7 @@ export default function Login(props) {
                     </Grid>
                 </form>
             </div>
-            <Box mt={8}>
-                <Copyright/>
-            </Box>
+            <Footer/>
         </Container>
     );
 }

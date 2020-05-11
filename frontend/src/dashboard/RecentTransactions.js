@@ -16,11 +16,14 @@ export default function RecentTransactions({transactions}) {
         <React.Fragment>
             <Title>Recent Transactions</Title>
             <TransactionTable transactions={transactions}/>
-            <div className={classes.seeMore}>
-                <Link color="primary" href="/transactions">
-                    See more transactions
-                </Link>
-            </div>
+            {
+                transactions && transactions.size > 5 && <div className={classes.seeMore}>
+                    <Link color="primary" href="/transactions">
+                        See more transactions
+                    </Link>
+                </div>
+            }
+
         </React.Fragment>
     );
 }

@@ -52,7 +52,7 @@ public class TransactionController {
         return new ResponseEntity<>(TransactionDto.fromTransaction(transaction), HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("confirm")
+    @GetMapping("/confirm")
     public ResponseEntity<TransactionDto> confirmTransaction(@CurrentUser UserPrincipal currentUser, @Query("reference") String reference) throws IOException {
         Transaction transaction = transactionService.confirmTransaction(currentUser.getId(), reference);
         return new ResponseEntity<>(TransactionDto.fromTransaction(transaction), HttpStatus.CREATED);
