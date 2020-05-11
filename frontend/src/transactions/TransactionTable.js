@@ -17,6 +17,7 @@ export default function TransactionTable({transactions}) {
                 <TableRow>
                     <TableCell>Symbol</TableCell>
                     <TableCell>Quantity</TableCell>
+                    <TableCell>Unit Price</TableCell>
                     <TableCell>Amount</TableCell>
                     <TableCell>Type</TableCell>
                     <TableCell>Status</TableCell>
@@ -29,6 +30,7 @@ export default function TransactionTable({transactions}) {
                     <TableRow key={transaction.reference}>
                         <TableCell>{transaction.symbol}</TableCell>
                         <TableCell>{transaction.quantity}</TableCell>
+                        <TableCell>{transaction.unitPrice}</TableCell>
                         <TableCell>{transaction.totalAmount}</TableCell>
                         <TableCell>{transaction.transactionType}</TableCell>
                         <TableCell>{transaction.transactionStatus}</TableCell>

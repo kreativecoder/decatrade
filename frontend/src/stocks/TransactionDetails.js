@@ -27,7 +27,7 @@ export default function TransactionDetails({transaction}) {
                     </TableRow>
                     <TableRow>
                         <TableCell>Current Price</TableCell>
-                        <TableCell>{transaction.currentPrice}</TableCell>
+                        <TableCell>{transaction.unitPrice}</TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell>Total</TableCell>

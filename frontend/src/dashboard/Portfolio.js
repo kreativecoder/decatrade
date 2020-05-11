@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from '@material-ui/core/Link';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Title from '../common/Title';
 
@@ -14,20 +14,20 @@ const useStyles = makeStyles({
     },
 });
 
-export default function Deposits() {
+export default function Portfolio({value}) {
     const classes = useStyles();
     return (
         <React.Fragment>
-            <Title>Recent Deposits</Title>
+            <Title>Portfolio Value</Title>
             <Typography component="p" variant="h4">
-                $3,024.00
+                $ {value}
             </Typography>
             <Typography color="textSecondary" className={classes.depositContext}>
-                on 15 March, 2019
+                **based on recent prices
             </Typography>
             <div>
-                <Link color="primary" href="#" onClick={preventDefault}>
-                    View balance
+                <Link color="primary" href="/stocks" onClick={preventDefault}>
+                    View stocks
                 </Link>
             </div>
         </React.Fragment>

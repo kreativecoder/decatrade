@@ -31,4 +31,5 @@ public class Transaction extends AuditModel {
     private TransactionStatus transactionStatus;
     private String reference;
     private long userId;
+    private double unitPrice;
 }

@@ -24,7 +24,7 @@ public interface TransactionService {
 
     List<Transaction> getUserTransactions(long userId, Date dateFrom, Date dateTo);
 
-    PortfolioSummary getPortfolioSummary(long userId);
+    PortfolioSummary getPortfolioSummary(long userId) throws IOException;
 
     List<StockDto> enrichStockDetails(long userId, List<StockDto> stocks) throws IOException;
 }

@@ -66,11 +66,10 @@ export default function Login(props) {
                 history.push("/dashboard");
             })
             .catch(function (error) {
-                console.log(error);
-                if (error.status === 403) {
-                    enqueueSnackbar("Your Username or Password is incorrect. Please try again!", {variant: 'error'});
+                setLoading(false);
+                if (error.response) {
+                    enqueueSnackbar(error.response.data.message, {variant: 'error'});
                 } else {
-                    setLoading(false);
                     enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
                 }
             });

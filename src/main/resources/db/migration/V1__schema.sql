@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS transactions
     transaction_status VARCHAR(10)        NOT NULL,
     symbol             VARCHAR(10)        NOT NULL,
     user_id            BIGINT             NOT NULL,
+    unit_price         NUMERIC            NOT NULL,
     created_at         TIMESTAMP WITH TIME ZONE,
     updated_at         TIMESTAMP WITH TIME ZONE,
     CONSTRAINT fk_txns_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE

@@ -67,7 +67,9 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setQuantity(transactionRequest.getQuantity());
         transaction.setTransactionType(transactionRequest.getTransactionType());
         transaction.setSymbol(transactionRequest.getSymbol().toUpperCase());
-        transaction.setAmount(getTotalAmount(transactionRequest.getQuantity(), transactionRequest.getSymbol()));
+        double currentPrice = getStockQuote(transaction.getSymbol()).getLatestPrice();
+        transaction.setAmount(getTotalAmount(transactionRequest.getQuantity(), currentPrice));
+        transaction.setUnitPrice(currentPrice);
         transaction.setTransactionStatus(PENDING);
         transaction.setUserId(userId);
 
@@ -135,11 +137,23 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public PortfolioSummary getPortfolioSummary(final long userId) {
+    public PortfolioSummary getPortfolioSummary(final long userId) throws IOException {
         PortfolioSummary portfolioSummary = new PortfolioSummary();
         List<TransactionDto> recentTransactions = transactionRepository.findTop5ByUserIdOrderByCreatedAtDesc(userId)
             .stream().map(TransactionDto::fromTransaction).collect(Collectors.toList());
 
+        List<StockDto> stocks = stockService.getAllStocks(userId).stream().map(StockDto::fromStock).collect(Collectors.toList());
+        if (!stocks.isEmpty()) {
+            List<String> symbols = stocks.stream().map(StockDto::getSymbol).collect(Collectors.toList());
+            Map<String, Double> prices = iexService.getBatchPrice(String.join(",", symbols));
+            BigDecimal value = BigDecimal.ZERO;
+
+            for (StockDto stock : stocks) {
+                value = value.add(BigDecimal.valueOf(prices.get(stock.getSymbol()))
+                    .multiply(BigDecimal.valueOf(stock.getQuantity())));
+            }
+            portfolioSummary.setPortfolioValue(value);
+        }
 
         portfolioSummary.setRecentTransactions(recentTransactions);
         return portfolioSummary;
@@ -176,13 +190,9 @@ public class TransactionServiceImpl implements TransactionService {
         return stocks;
     }
 
-    private BigDecimal getTotalAmount(long quantity, String symbol) throws IOException {
-        QuoteResponse quoteResponse = getStockQuote(symbol);
-        double currentPrice = quoteResponse.getLatestPrice();
+    private BigDecimal getTotalAmount(long quantity, double currentPrice) {
 
         //do gymnastics here to get total cost, add charges and all
-        BigDecimal total = BigDecimal.valueOf(currentPrice).multiply(BigDecimal.valueOf(quantity));
-
-        return total;
+        return BigDecimal.valueOf(currentPrice).multiply(BigDecimal.valueOf(quantity));
     }
 }

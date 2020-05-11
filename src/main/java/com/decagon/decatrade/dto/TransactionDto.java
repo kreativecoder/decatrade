@@ -19,6 +19,7 @@ public class TransactionDto {
     private TransactionStatus transactionStatus;
     private String reference;
     private Date transactionDate;
+    private double unitPrice;
 
     public static TransactionDto fromTransaction(Transaction txn) {
         return TransactionDto.builder().totalAmount(txn.getAmount())
@@ -27,6 +28,8 @@ public class TransactionDto {
             .reference(txn.getReference())
             .transactionType(txn.getTransactionType())
             .transactionStatus(txn.getTransactionStatus())
-            .transactionDate(txn.getCreatedAt()).build();
+            .transactionDate(txn.getCreatedAt())
+            .unitPrice(txn.getUnitPrice())
+            .build();
     }
 }

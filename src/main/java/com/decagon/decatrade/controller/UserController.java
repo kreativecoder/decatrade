@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +63,7 @@ public class UserController {
     }
 
     @GetMapping("/portfolio/summary")
-    public PortfolioSummary getUserPortfolio(@CurrentUser UserPrincipal currentUser) {
+    public PortfolioSummary getUserPortfolio(@CurrentUser UserPrincipal currentUser) throws IOException {
         return transactionService.getPortfolioSummary(currentUser.getId());
     }
 

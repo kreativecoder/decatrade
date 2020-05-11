@@ -86,7 +86,11 @@ export default function Stocks(props) {
                 loadStocks()
             })
             .catch(function (error) {
-                enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
+                if (error.response) {
+                    enqueueSnackbar(error.response.data.message, {variant: 'error'});
+                } else {
+                    enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
+                }
             });
     };
 
@@ -98,7 +102,11 @@ export default function Stocks(props) {
                 loadStocks()
             })
             .catch(function (error) {
-                enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
+                if (error.response) {
+                    enqueueSnackbar(error.response.data.message, {variant: 'error'});
+                } else {
+                    enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
+                }
             });
     };
 
@@ -117,7 +125,11 @@ export default function Stocks(props) {
                 setOpenCompleteTransaction(true)
             })
             .catch(function (error) {
-                enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
+                if (error.response) {
+                    enqueueSnackbar(error.response.data.message, {variant: 'error'});
+                } else {
+                    enqueueSnackbar(error.message || 'Sorry! Something went wrong. Please try again!', {variant: 'error'});
+                }
             });
     };
 

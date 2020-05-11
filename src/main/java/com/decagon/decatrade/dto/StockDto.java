@@ -1,5 +1,6 @@
 package com.decagon.decatrade.dto;
 
+import com.decagon.decatrade.model.Stock;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,4 +17,11 @@ public class StockDto {
     private BigDecimal currentValue;
     private BigDecimal amountPaid;
     private double percentageChange;
+
+    public static StockDto fromStock(Stock stock) {
+        return StockDto.builder()
+            .symbol(stock.getSymbol())
+            .quantity(stock.getQuantity())
+            .build();
+    }
 }

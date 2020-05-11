@@ -10,6 +10,7 @@ import com.decagon.decatrade.service.StockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +23,8 @@ public class StockServiceImpl implements StockService {
 
 
     @Override
-    public Stock buy(final Transaction transaction) throws IOException {
+    @Transactional
+    public void buy(final Transaction transaction) throws IOException {
         Stock stock;
 
         Optional<Stock> optionalStock = stockRepository.findByUserIdAndSymbol(transaction.getUserId(), transaction.getSymbol());
@@ -37,22 +39,23 @@ public class StockServiceImpl implements StockService {
             stock.setQuantity(transaction.getQuantity());
         }
 
-        return stockRepository.save(stock);
+        stockRepository.save(stock);
     }
 
     @Override
-    public Stock sell(final Transaction transaction) throws IOException {
+    @Transactional
+    public void sell(final Transaction transaction) throws IOException {
         Optional<Stock> optionalStock = stockRepository.findByUserIdAndSymbol(transaction.getUserId(), transaction.getSymbol());
         //sell position
         if (optionalStock.isPresent()) {
             Stock stock = optionalStock.get();
             stock.setQuantity(stock.getQuantity() - transaction.getQuantity());
-
-            return stockRepository.save(stock);
+            if (stock.getQuantity() == 0) {
+                stockRepository.delete(stock);
+            } else {
+                stockRepository.save(stock);
+            }
         }
-
-        //should not happen, as stock validation was done in the first request
-        throw new IOException("Contact Admin.");
     }
 
     @Override

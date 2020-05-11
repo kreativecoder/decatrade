@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface StockService {
-    Stock buy(Transaction transaction) throws IOException;
+    void buy(Transaction transaction) throws IOException;
 
-    Stock sell(Transaction transaction) throws IOException;
+    void sell(Transaction transaction) throws IOException;
 
     void validateCanSell(long userId, String symbol, long quantity);
 

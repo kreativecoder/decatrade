@@ -29,9 +29,7 @@ public class StockController {
 
     @GetMapping
     public ResponseEntity<List<StockDto>> getUserStocks(@CurrentUser UserPrincipal currentUser) throws IOException {
-        List<StockDto> stocks = stockService.getAllStocks(currentUser.getId()).stream().map(
-            stock -> new StockDto(stock.getSymbol(), stock.getQuantity(), null, null, null, 0)
-        ).collect(Collectors.toList());
+            List<StockDto> stocks = stockService.getAllStocks(currentUser.getId()).stream().map(StockDto::fromStock).collect(Collectors.toList());
 
         return ok(transactionService.enrichStockDetails(currentUser.getId(), stocks));
     }

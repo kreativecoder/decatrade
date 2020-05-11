@@ -29,8 +29,6 @@ export default function Trade(props) {
         symbol, tradeType, quantity
     } = props;
 
-    console.log(tradeType)
-
     return (
         <Dialog disableBackdropClick={true} disableEscapeKeyDown={true} open={openTradeStock}
                 onClose={handleClose} aria-labelledby="form-dialog-title">

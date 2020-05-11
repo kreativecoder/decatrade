@@ -5,7 +5,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Chart from './Chart';
-import Deposits from './Deposits';
+import Portfolio from './Portfolio';
 import RecentTransactions from './RecentTransactions';
 import Footer from "../common/Footer";
 import Header from "../common/Header";
@@ -71,10 +71,10 @@ export default function Dashboard(props) {
                                 <Chart/>
                             </Paper>
                         </Grid>
-                        {/* Recent Deposits */}
+                        {/* Recent Portfolio */}
                         <Grid item xs={12} md={4} lg={3}>
                             <Paper className={fixedHeightPaper}>
-                                <Deposits/>
+                                <Portfolio value={summary.portfolioValue}/>
                             </Paper>
                         </Grid>
                         {/* Recent RecentTransactions */}
