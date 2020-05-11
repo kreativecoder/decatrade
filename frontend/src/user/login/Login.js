@@ -10,7 +10,7 @@ import {makeStyles} from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {Box, Button, CircularProgress, FormControlLabel, Grid} from "@material-ui/core";
 import {login} from "../../decaTradeService";
-import { ACCESS_TOKEN } from '../../constants';
+import {ACCESS_TOKEN} from '../../constants';
 import {useHistory} from "react-router-dom";
 import {isAuthenticated} from "../../common/AuthService";
 
@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login(props) {
 
-    if(isAuthenticated()) {
+    if (isAuthenticated()) {
         props.history.push("/")
     }
 
@@ -75,7 +75,6 @@ export default function Login(props) {
                 console.log(response.data);
                 // notifySuccess("Login successful!");
                 localStorage.setItem(ACCESS_TOKEN, response.data.token);
-                props.postLogin();
                 history.push("/dashboard");
             })
             .catch(function (error) {

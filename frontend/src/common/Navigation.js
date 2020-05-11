@@ -9,22 +9,22 @@ import BarChartIcon from "@material-ui/icons/BarChart";
 import React from "react";
 
 
-export default function Navigation() {
+export default function Navigation({title}) {
     return <List>
         <div>
-            <ListItem button selected={true} component={Link} to="/dashboard">
+            <ListItem button selected={title === 'Dashboard'} component={Link} to="/dashboard">
                 <ListItemIcon>
                     <DashboardIcon/>
                 </ListItemIcon>
                 <ListItemText primary="Dashboard"/>
             </ListItem>
-            <ListItem button component={Link} to="/stocks">
+            <ListItem button selected={title === 'Stocks'} component={Link} to="/stocks">
                 <ListItemIcon>
                     <ShoppingCartIcon/>
                 </ListItemIcon>
                 <ListItemText primary="Stocks"/>
             </ListItem>
-            <ListItem button component={Link} to="/transactions">
+            <ListItem button selected={title === 'Transactions'} component={Link} to="/transactions">
                 <ListItemIcon>
                     <BarChartIcon/>
                 </ListItemIcon>
