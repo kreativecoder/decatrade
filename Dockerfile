@@ -1,30 +1,24 @@
-#frontend
+FROM node as frontend
+WORKDIR /frontend
+COPY frontend .
+RUN yarn install
+RUN yarn build
 
-#server build
-FROM maven:3-jdk-8 as build
-
-WORKDIR /app
-
-COPY mvnw .
-COPY .mvn .mvn
+FROM maven:3-jdk-8 as backend
+WORKDIR /backend
 
 COPY pom.xml .
-
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 COPY src src
 
-RUN ./mvnw package -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+RUN mkdir -p src/main/resources/static
+COPY --from=frontend /frontend/build src/main/resources/static
+RUN mvn package -P docker
 
-#Run
-FROM openjdk:8-jre-alpine
-
-ARG DEPENDENCY=/app/target/dependency
-
-# Copy project dependencies from the build stage
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.decagon.decatrade.Application"]
+FROM openjdk:8-jdk-alpine
+COPY --from=backend /backend/target/decatrade-0.0.1-SNAPSHOT.jar ./app.jar
+EXPOSE 5000
+RUN adduser -D user
+USER user
+CMD [ "sh", "-c", "java -Djava.security.egd=file:/dev/./urandom -jar app.jar" ]

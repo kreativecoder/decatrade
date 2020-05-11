@@ -10,8 +10,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db/decatrade
       SPRING_DATASOURCE_USERNAME: decatrade
       SPRING_DATASOURCE_PASSWORD: decatrade
-      IEX_BASE_URL: https://cloud.iexapis.com/stable/
-      IEX_TOKEN: pk_d024f60c01db434ebcc6a3aa20baeaf3
+      IEX_BASE_URL: https://sandbox.iexapis.com/stable/
+      IEX_TOKEN: Tsk_2345bb23976943989ea7c996c99e49f5
     depends_on:
       - db
 
